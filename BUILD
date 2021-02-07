@@ -25,7 +25,19 @@ cc_binary(
             "-lm",  # some builtin ops, e.g., tanh, need -lm
             "-Wl,-rpath=/data/local/tmp",  # for hexagon delegate
         ],
-        "//conditions:default": [],
+        "//conditions:default": [
+            "-L/home/owner/tmp/aarch64-libs", # パスは適宜変更
+            "-lEGL",
+            "-lxcb",
+            "-lX11",
+            "-lXau",
+            "-lXdmcp",
+            "-ldrm",
+            "-lstdc++",
+            "-lxcb-dri2",
+            "-lX11-xcb",
+            "-lbsd",
+        ],
     }),
     deps = [
         ":bitmap_helpers",
@@ -52,7 +64,10 @@ cc_binary(
             "//tensorflow/lite/delegates/gpu:delegate",
             "//tensorflow/lite/delegates/hexagon:hexagon_delegate",
         ],
-        "//conditions:default": [],
+        "//conditions:default": [
+            # 常に GPU Delegate を利用する
+            "//tensorflow/lite/delegates/gpu:delegate",
+        ],
     }),
 )
 

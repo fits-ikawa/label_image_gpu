@@ -36,6 +36,7 @@ limitations under the License.
 #include <vector>
 
 #include "absl/memory/memory.h"
+#include "tensorflow/lite/delegates/gpu/delegate.h"
 #include "tensorflow/lite/delegates/nnapi/nnapi_delegate.h"
 #include "tensorflow/lite/delegates/xnnpack/xnnpack_delegate.h"
 #include "tensorflow/lite/examples/label_image/bitmap_helpers.h"
@@ -306,6 +307,16 @@ void RunInference(Settings* settings,
       LOG(INFO) << "Applied " << delegate.first << " delegate.\n";
     }
   }
+
+  // GPU Delegate
+  // 参考:
+  // https://qiita.com/terryky/items/9f096149efbc6e3ac3d2#31-%E3%82%A2%E3%83%97%E3%83%AA%E3%81%AE%E4%BF%AE%E6%AD%A3
+  const TfLiteGpuDelegateOptionsV2 options = {
+      .is_precision_loss_allowed = 1,
+      .inference_preference =
+          TFLITE_GPU_INFERENCE_PREFERENCE_FAST_SINGLE_ANSWER};
+  auto* delegate = TfLiteGpuDelegateV2Create(&options);
+  interpreter->ModifyGraphWithDelegate(delegate);
 
   if (interpreter->AllocateTensors() != kTfLiteOk) {
     LOG(ERROR) << "Failed to allocate tensors!\n";
